@@ -10,7 +10,7 @@ pygame.display.set_caption('Space Shooter')
 pygame.display.set_icon(Icon)
 running = True
 
-# import an image
+# import an image here
 player_surface = pygame.image.load('5games-main/space shooter/images/player.png').convert_alpha()
 player_rect = player_surface.get_frect(center = (screen_width / 2,screen_hight / 2))
 
