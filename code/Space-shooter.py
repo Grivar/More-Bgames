@@ -32,6 +32,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
+        if event.type == pygame.KEYDOWN:
+            print(event.key)
 
     
     screen.fill('cadetblue4')
