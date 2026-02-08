@@ -1,7 +1,45 @@
 import pygame
 from random import randint
-from os.path import join
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self, groups):
+        super().__init__(groups)
+        self.image = pygame.image.load('5games-main/space shooter/images/player.png').convert_alpha()
+        self.rect = self.image.get_frect(center = (screen_width / 2, screen_hight -60))
+        self.direction = pygame.Vector2()
+        self.speed = 300
+
+        #cooldown
+        self.can_shoot = True
+        self.laser_shoot_time = 0
+        self.cooldown_duration = 400
+
+    def laser_timer(self):
+        if not self.can_shoot:
+            current_time = pygame.time.get_ticks()
+            print(current_time)
+
+    def update(self, dt):
+        keys = pygame.key.get_pressed()
+        self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a])
+        self.direction.y = int(keys[pygame.K_s]) - int(keys[pygame.K_w])
+        self.direction = self.direction.normalize() if self.direction else self.direction
+        self.rect.center += self.direction * self.speed * dt
+
+        recent_keys = pygame.key.get_just_pressed()
+        if recent_keys[pygame.K_SPACE] and self.can_shoot:
+            print("GGGGGGGGGGGGGGGGGG")
+            self.can_shoot = False
+        self.laser_timer()
+        
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self, groups, surf):
+        super().__init__(groups)
+        self.image = surf
+        self.rect = self.image.get_frect(center = (randint(0, screen_width), randint(0, screen_hight)))
+
+# General
 pygame.init()
 screen_width, screen_hight = 1280, 720 
 screen = pygame.display.set_mode((screen_width, screen_hight))
@@ -11,11 +49,11 @@ pygame.display.set_icon(Icon)
 running = True
 clock = pygame.time.Clock()
 
-# import an image here
-player_surface = pygame.image.load('5games-main/space shooter/images/player.png').convert_alpha()
-player_rect = player_surface.get_frect(midbottom = (screen_width / 2, screen_hight -60))
-player_direction = pygame.math.Vector2(20,-10)
-player_speed = 100
+all_sprites = pygame.sprite.Group()
+star_surf = pygame.image.load('5games-main/space shooter/images/star.png').convert_alpha()
+for i in range(20):
+    Star(all_sprites, star_surf)
+player = Player(all_sprites)
 
 meteor = pygame.image.load('5games-main/space shooter/images/meteor.png').convert_alpha()
 meteor_rect = meteor.get_frect(center = (screen_width / 2, screen_hight / 2))
@@ -23,8 +61,9 @@ meteor_rect = meteor.get_frect(center = (screen_width / 2, screen_hight / 2))
 lasor = pygame.image.load('5games-main/space shooter/images/laser.png').convert_alpha()
 lasor_rect = lasor.get_frect(bottomleft = (20, screen_hight -20))
 
-star = pygame.image.load('5games-main/space shooter/images/star.png').convert_alpha()
-star_position = [(randint(0, screen_width), randint(0, screen_hight)) for i in range(30)]
+# costom events
+meteor_event = pygame.event.custom_type()
+pygame.time.set_timer(meteor_event, 500)
 
 while running:
     dt = clock.tick() / 1000
@@ -32,24 +71,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        
-        if event.type == pygame.KEYDOWN:
-            print(event.key)
-
+        if event.type == meteor_event:
+            print('YOU GAY!')
     
-    screen.fill('cadetblue4')
-    for pos in star_position:
-        screen.blit(star, pos)
+    all_sprites.update(dt)
 
-    screen.blit(meteor, meteor_rect)
-    screen.blit(lasor, lasor_rect)
+    # draw the game
+    screen.fill('cadetblue4') 
+    all_sprites.draw(screen)
 
-    if player_rect.right >= screen_width or player_rect.left < 0:
-        player_direction.x *= -1
-    if player_rect.bottom >= screen_hight or player_rect.top < 0:
-        player_direction.y *= -1
-    player_rect.center += player_direction * player_speed * dt
-    screen.blit(player_surface, player_rect)
     pygame.display.update()
 
 
