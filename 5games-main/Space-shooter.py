@@ -1,10 +1,21 @@
 import pygame
 from random import randint, uniform
+import os
+import sys
+
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        base_path = sys._MEIPASS  # PyInstaller
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))  # .py file location
+
+    return os.path.join(base_path, relative_path)
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups):
         super().__init__(groups)
-        self.image = pygame.image.load('5games-main/space shooter/images/player.png').convert_alpha()
+        self.image = pygame.image.load(resource_path("space_shooter/images/player.png")).convert_alpha()
         self.rect = self.image.get_frect(center = (screen_width / 2, screen_hight -60))
         self.direction = pygame.Vector2()
         self.speed = 300
@@ -84,16 +95,30 @@ def collitions():
 pygame.init()
 screen_width, screen_hight = 1280, 720 
 screen = pygame.display.set_mode((screen_width, screen_hight))
-Icon = pygame.image.load("5games-main/space shooter/images/laser.png")
+#------------------------------
+base = os.path.dirname(os.path.abspath(__file__))
+print("BASE PATH:", base)
+print("BASE CONTENTS:", os.listdir(base))
+
+print("SPACE_SHOOTER EXISTS:",
+      os.path.exists(os.path.join(base, "space_shooter")))
+
+print("IMAGES EXISTS:",
+      os.path.exists(os.path.join(base, "space_shooter", "images")))
+
+print("LASER EXISTS:",
+      os.path.exists(os.path.join(base, "space_shooter", "images", "laser.png")))
+#------------------------------------
+Icon = pygame.image.load(resource_path("space_shooter/images/laser.png"))
 pygame.display.set_caption('Space Shooter')
 pygame.display.set_icon(Icon)
 running = True
 clock = pygame.time.Clock()
 
 # import
-star_surf = pygame.image.load('5games-main/space shooter/images/star.png').convert_alpha()
-meteor = pygame.image.load('5games-main/space shooter/images/meteor.png').convert_alpha()
-lasor = pygame.image.load('5games-main/space shooter/images/laser.png').convert_alpha()
+star_surf = pygame.image.load(resource_path("space_shooter/images/star.png")).convert_alpha()
+meteor = pygame.image.load(resource_path("space_shooter/images/meteor.png")).convert_alpha()
+lasor = pygame.image.load(resource_path("space_shooter/images/laser.png")).convert_alpha()
 
 # sprites
 all_sprites = pygame.sprite.Group()
